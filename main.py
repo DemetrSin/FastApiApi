@@ -49,6 +49,13 @@ class ProductCreateModel(BaseModel):
     category_id: int
 
 
+class ProductUpdateModel(BaseModel):
+    name: str
+    description: str
+    price: float
+    category_id: int
+
+
 class CategoryCreateModel(BaseModel):
     name: str
 
@@ -124,5 +131,25 @@ def create_category(category: CategoryCreateModel, db: Session = Depends(get_db)
     db.refresh(new_category)
     return new_category
 
+
+@app.put("/products/{product_id}", response_model=ProductModel)
+def update_product(product_id: int, product: ProductCreateModel, db: Session = Depends(get_db)):
+    existing_product = db.query(Product).filter(Product.id == product_id).first()
+    if existing_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    category = db.query(Category).filter(Category.id == product.category_id).first()
+    if category is None:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    existing_product.name = product.name
+    existing_product.description = product.description
+    existing_product.price = product.price
+    existing_product.category_id = product.category_id
+
+    db.commit()
+    db.refresh(existing_product)
+
+    return existing_product
 
 
