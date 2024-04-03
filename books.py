@@ -63,7 +63,7 @@ class FilmGenreAssociation(Base):
     genre_id = Column(Integer, ForeignKey('Genres.id'), primary_key=True)
 
 
-SQLALCHEMY_DATABASE_URL = "sqlite:///./test.db"
+SQLALCHEMY_DATABASE_URL = "sqlite:///./films.db"
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 Base.metadata.create_all(bind=engine)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
