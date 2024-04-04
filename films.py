@@ -1,4 +1,4 @@
-from typing import List
+from typing import List, Optional
 
 from fastapi import FastAPI, HTTPException, Depends
 from pydantic import BaseModel
@@ -14,12 +14,12 @@ Base = declarative_base()
 class Film(Base):
     __tablename__ = 'Films'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    name = Column(String, index=True)
+    film_name = Column(String, index=True)
     release_date = Column(Date)
     duration = Column(Integer)
     description = Column(String)
     rating = Column(Float)
-    producers = relationship('Producer', secondary='film_producer_association')
+    producers = relationship('Producer', secondary='film_producer_association', back_populates="films")
     actors = relationship("Actor", secondary="film_actor_association", back_populates="films")
     genres = relationship("Genre", secondary="film_genre_association", back_populates="films")
 
@@ -41,7 +41,7 @@ class Actor(Base):
 class Genre(Base):
     __tablename__ = 'Genres'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    name = Column(String)
+    genre_name = Column(String)
     films = relationship("Film", secondary="film_genre_association")
 
 
@@ -77,3 +77,72 @@ def get_db():
         db.close()
 
 
+class GenreBaseModel(BaseModel):
+    genre_name: str
+
+
+class GenreCreateModel(GenreBaseModel):
+    pass
+
+
+class GenreModel(GenreBaseModel):
+    id: int
+
+    class Config:
+        orm_mode = True
+
+
+class ProducerBaseModel(BaseModel):
+    full_name: str
+
+
+class ProducerCreateModel(ProducerBaseModel):
+    pass
+
+
+class ProducerModel(ProducerBaseModel):
+    id: int
+    films: List[Film] = []
+
+    class Config:
+        orm_mode = True
+
+
+class ActorBaseModel(BaseModel):
+    full_name: str
+
+
+class ActorCreateModel(ActorBaseModel):
+    pass
+
+
+class ActorModel(ActorBaseModel):
+    id: int
+    films: List[Film] = []
+
+    class Config:
+        orm_mode = True
+
+
+class FilmBaseModel(BaseModel):
+    film_name: str
+    release_date: Optional[str]
+    duration: Optional[int]
+    description: Optional[str]
+    rating: Optional[float]
+
+
+class FilmCreatModele(FilmBaseModel):
+    producers: Optional[List[ProducerCreateModel]] = []
+    actors: Optional[List[ActorCreateModel]] = []
+    genres: Optional[List[GenreCreateModel]] = []
+
+
+class FilmModel(FilmBaseModel):
+    id: int
+    producers: List[Producer] = []
+    actors: List[Actor] = []
+    genres: List[Genre] = []
+
+    class Config:
+        orm_mode = True
