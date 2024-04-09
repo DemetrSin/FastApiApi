@@ -15,7 +15,9 @@ def outer(n, flag=False):
             avg_time = total / n
             if flag:
                 print(f"Avg Time: {avg_time}, total: {total}")
-            print(total)
+            with open('t.txt', 'a') as f:
+                text = f"{func.__name__} > {total}\n"
+                f.write(text)
             return result
 
         return wrapper

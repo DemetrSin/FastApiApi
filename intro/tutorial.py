@@ -94,8 +94,8 @@ def select_heroes_where():
 def main():
     # create_db_and_tables()
     # create_heroes()
-    # select_heroes()
-    select_heroes_where()
+    select_heroes()
+    # select_heroes_where()
 
 
 if __name__ == "__main__":
