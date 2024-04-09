@@ -1,6 +1,4 @@
-import os.path
 import random
-import time
 
 from sqlmodel import Field, Session, SQLModel, create_engine, select, or_, col
 from timer import outer
@@ -51,13 +49,23 @@ class PersonNotIndexed(SQLModel, table=True):
 # def create_person():
 #     with Session(engine) as session:
 #         for _ in range(10000):
-#             z = PersonNotIndexed(name=faker.name(), age=random.randint(18, 80), address=faker.address())
+#             z = PersonIndexed(name=faker.name(), age=random.randint(18, 80), address=faker.address())
 #             session.add(z)
 #         session.commit()
 
 
 @outer(1, flag=True)
-def create_person_with_func():
+def create_person_with_index():
+    with Session(engine) as session:
+        for person in generate_random_users(10000):
+            name, age, address = person
+            pers = PersonIndexed(name=name, age=age, address=address)
+            session.add(pers)
+        session.commit()
+
+
+@outer(1, flag=True)
+def create_person_without_index():
     with Session(engine2) as session:
         for person in generate_random_users(10000):
             name, age, address = person
@@ -66,17 +74,26 @@ def create_person_with_func():
         session.commit()
 
 
-def show_db_data():
+@outer(1)
+def show_db_data_index():
     with Session(engine) as session:
         persons = session.exec(select(PersonIndexed)).all()
-        print(persons)
+        # print(persons)
+
+
+@outer(1)
+def show_db_data():
+    with Session(engine2) as session:
+        persons = session.exec(select(PersonIndexed)).all()
+        # print(persons)
 
 
 def main():
     create_db_and_tables()
-    create_person()
-    create_person_with_func()
-    # show_db_data()
+    create_person_with_index()
+    create_person_without_index()
+    show_db_data_index()
+    show_db_data()
 
 
 if __name__ == '__main__':
