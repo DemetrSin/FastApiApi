@@ -28,9 +28,6 @@ def generate_random_users(num_users):
     return user_data
 
 
-faker = Faker()
-
-
 class PersonIndexed(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True)
@@ -47,6 +44,8 @@ class PersonNotIndexed(SQLModel, table=True):
 # This version is slower in every test.
 # @outer(1, flag=True)
 # def create_person():
+#     faker = Faker()
+
 #     with Session(engine) as session:
 #         for _ in range(10000):
 #             z = PersonIndexed(name=faker.name(), age=random.randint(18, 80), address=faker.address())

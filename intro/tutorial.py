@@ -109,13 +109,29 @@ def one_first_get():
         print(session.get(Hero, 9000))  # None
 
 
+# LIMIT and OFFSET
+
+
+def limit_and_offset():
+    with Session(engine) as session:
+        statement_limit = select(Hero).limit(3)
+        statement_offset_limit = select(Hero).offset(3).limit(3)
+        statement_mix = select(Hero).where(Hero.age >= 35).offset(1).limit(2)
+        results = session.exec(statement_mix)
+        heroes = results.all()
+        print(heroes)
+        # OR
+        print(session.exec(select(Hero).where(Hero.age >= 35).offset(1).limit(1)).one())
+
+
 def main():
     # create_db_and_tables()
     # create_heroes()
     # select_heroes()
     # select_heroes2()
     # select_heroes_where()
-    one_first_get()
+    # one_first_get()
+    limit_and_offset()
 
 
 if __name__ == "__main__":
