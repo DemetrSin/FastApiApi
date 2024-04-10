@@ -42,19 +42,24 @@ def create_heroes():
 # SELECT - select(class)
 
 
-# def select_heroes():
-#     with Session(engine) as session:
-#         statement = select(Hero)
-#         results = session.execute(statement)
-#         for result in results:
-#             print(result)
-#         print()
+def select_heroes():
+    with Session(engine) as session:
+        statement = select(Hero)
+        results = session.execute(statement)
+        for result in results:
+            print(result)
+        print()
         # OR
-        # print(results.all())  # returns a list
+        print(results.all())  # returns a list
+#         OR
+        print(result.first())  # returns first row
+        print(result.one())  # returns ONLY ONE row OR Error
+
 
 # OR
 
-def select_heroes():
+
+def select_heroes2():
     with Session(engine) as session:
         heroes = session.exec(select(Hero)).all()
         print(heroes)
@@ -91,11 +96,26 @@ def select_heroes_where():
         print([x for x in statement_where_with_col])
 
 
+# one(), first(), get()
+
+def one_first_get():
+    with Session(engine) as session:
+        print(session.exec(select(Hero).where(Hero.id == 2)).first())
+        print(session.exec(select(Hero).where(Hero.id == 9000)).first())  # None
+        # OR
+        print(session.exec(select(Hero).where(Hero.id == 2)).one())
+        # print(session.exec(select(Hero).where(Hero.id == 9000)).one())  # Error
+        print(session.get(Hero, 2))
+        print(session.get(Hero, 9000))  # None
+
+
 def main():
     # create_db_and_tables()
     # create_heroes()
-    select_heroes()
+    # select_heroes()
+    # select_heroes2()
     # select_heroes_where()
+    one_first_get()
 
 
 if __name__ == "__main__":

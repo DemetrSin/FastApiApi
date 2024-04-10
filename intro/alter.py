@@ -57,7 +57,7 @@ class PersonNotIndexed(SQLModel, table=True):
 @outer(1, flag=True)
 def create_person_with_index():
     with Session(engine) as session:
-        for person in generate_random_users(10000):
+        for person in generate_random_users(1000000):
             name, age, address = person
             pers = PersonIndexed(name=name, age=age, address=address)
             session.add(pers)
@@ -67,7 +67,7 @@ def create_person_with_index():
 @outer(1, flag=True)
 def create_person_without_index():
     with Session(engine2) as session:
-        for person in generate_random_users(10000):
+        for person in generate_random_users(1000000):
             name, age, address = person
             pers = PersonNotIndexed(name=name, age=age, address=address)
             session.add(pers)
@@ -77,21 +77,26 @@ def create_person_without_index():
 @outer(1)
 def show_db_data_index():
     with Session(engine) as session:
-        persons = session.exec(select(PersonIndexed)).all()
+        # persons = session.exec(select(PersonIndexed)).all()
+        person = session.exec(select(PersonIndexed).where(PersonIndexed.age >= 32, PersonIndexed.id <= 50)).all()
         # print(persons)
+        print(person)
+        print('\n'*5)
 
 
 @outer(1)
 def show_db_data():
     with Session(engine2) as session:
-        persons = session.exec(select(PersonIndexed)).all()
+        # persons = session.exec(select(PersonIndexed)).all()
+        person = session.exec(select(PersonNotIndexed).where(PersonNotIndexed.age >= 32, PersonNotIndexed.age <= 50)).all()
         # print(persons)
+        print(person)
 
 
 def main():
-    create_db_and_tables()
-    create_person_with_index()
-    create_person_without_index()
+    # create_db_and_tables()
+    # create_person_with_index()
+    # create_person_without_index()
     show_db_data_index()
     show_db_data()
 

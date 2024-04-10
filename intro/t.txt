@@ -1,0 +1,11 @@
+create_person_with_index > 202.3428717001807
+create_person_without_index > 172.1933757001534
+show_db_data_index > 7.4434688000474125
+show_db_data > 0.0009614999871701002
+
+
+
+show_db_data_index > 0.0027938000857830048
+show_db_data > 1.616905199829489
+show_db_data_index > 0.0066327000968158245
+show_db_data > 3.36943869991228
