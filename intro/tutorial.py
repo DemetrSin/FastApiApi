@@ -6,6 +6,7 @@ class Hero(SQLModel, table=True):
     name: str = Field(index=True)
     secret_name: str
     age: int | None = Field(default=None, index=True)
+    team_id: int | None = Field(default=None, foreign_key='team.id')
 
 
 sqlite_file_name = "database.db"
