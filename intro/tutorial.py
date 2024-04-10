@@ -52,8 +52,8 @@ def select_heroes():
         # OR
         print(results.all())  # returns a list
 #         OR
-        print(result.first())  # returns first row
-        print(result.one())  # returns ONLY ONE row OR Error
+        print(results.first())  # returns first row
+        # print(results.one())  # returns ONLY ONE row OR Error
 
 
 # OR
@@ -146,6 +146,17 @@ def update_heroes():
         print(hero2)
 
 
+# DELETE
+
+
+def delete_hero():
+    with Session(engine) as session:
+        hero = session.exec(select(Hero).where(Hero.name == 'Spider-Youngster')).first()
+        session.delete(hero)
+        session.commit()
+        print('Deleted hero: ', hero)
+
+
 def main():
     # create_db_and_tables()
     # create_heroes()
@@ -154,7 +165,8 @@ def main():
     # select_heroes_where()
     # one_first_get()
     # limit_and_offset()
-    update_heroes()
+    # update_heroes()
+    delete_hero()
 
 
 if __name__ == "__main__":
