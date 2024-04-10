@@ -64,11 +64,39 @@ def select_heroes_join():
             print(f"Hero: {hero}\nTeam: {team}")
 
 
+# Update data connection
+
+
+def update_connection():
+    with Session(engine) as session:
+        team_preventers = session.exec(select(Team).where(Team.name == 'Preventers')).first()
+        spider_boy = session.exec(select(Hero).where(Hero.name == 'Spider-Boy')).first()
+        # spider_boy = session.get(Hero, 3)
+        spider_boy.team_id = team_preventers.id
+        session.add(spider_boy)
+        session.commit()
+
+
+# Break data connection
+
+
+def remove_connection():
+    with Session(engine) as session:
+        hero = session.get(Hero, 3)
+        hero.team_id = None
+        session.add(hero)
+        session.commit()
+        session.refresh(hero)
+        print(hero)
+
+
 def main():
     # create_db_and_tables()
     # create_data()
     # select_heroes()
-    select_heroes_join()
+    # select_heroes_join()
+    # update_connection()
+    remove_connection()
 
 
 if __name__ == "__main__":
