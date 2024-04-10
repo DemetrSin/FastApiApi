@@ -124,6 +124,28 @@ def limit_and_offset():
         print(session.exec(select(Hero).where(Hero.age >= 35).offset(1).limit(1)).one())
 
 
+# UPDATE
+
+def update_heroes():
+    with Session(engine) as session:
+        hero1 = session.exec(select(Hero).where(Hero.name == 'Spider-Boy')).one()
+        hero2 = session.exec(select(Hero).where(Hero.name == "Captain North America")).one()
+        print(hero1)
+        print(hero2)
+        hero1.age = 18
+        hero1.name = "Spider-Youngster"
+        hero2.age = 35
+        hero2.name = "Captain North America Except Canada"
+
+        session.add(hero1)
+        session.add(hero2)
+        session.commit()
+        session.refresh(hero1)
+        session.refresh(hero2)
+        print(hero1)
+        print(hero2)
+
+
 def main():
     # create_db_and_tables()
     # create_heroes()
@@ -131,7 +153,8 @@ def main():
     # select_heroes2()
     # select_heroes_where()
     # one_first_get()
-    limit_and_offset()
+    # limit_and_offset()
+    update_heroes()
 
 
 if __name__ == "__main__":
