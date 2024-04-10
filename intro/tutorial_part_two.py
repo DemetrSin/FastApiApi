@@ -1,4 +1,4 @@
-from sqlmodel import Field, SQLModel, create_engine, Session
+from sqlmodel import Field, SQLModel, create_engine, Session, select
 from tutorial import Hero, engine, create_db_and_tables
 
 
@@ -40,9 +40,35 @@ def create_data():
         print("Created hero:", hero_spider_boy)
 
 
+def select_heroes():
+    with Session(engine) as session:
+        heroes = session.exec(select(Hero, Team).where(Hero.team_id == Team.id))
+        for hero, team in heroes:
+            print(f"Hero: {hero}\nTeam: {team}")
+
+
+# JOIN
+
+
+def select_heroes_join():
+    with Session(engine) as session:
+        heroes = session.exec(select(Hero, Team).join(Team))
+        # OR
+        heroes = session.exec(select(Hero, Team).join(Team, isouter=True))
+        heroes = session.exec(select(Hero).join(Team, isouter=True).where(Team.name == "Preventers"))
+        for hero in heroes:
+            print(hero)
+
+        heroes = session.exec(select(Hero, Team).join(Team, isouter=True).where(Team.name == "Preventers"))
+        for hero, team in heroes:
+            print(f"Hero: {hero}\nTeam: {team}")
+
+
 def main():
-    create_db_and_tables()
-    create_data()
+    # create_db_and_tables()
+    # create_data()
+    # select_heroes()
+    select_heroes_join()
 
 
 if __name__ == "__main__":
