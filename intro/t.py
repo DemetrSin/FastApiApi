@@ -117,6 +117,16 @@ def select_heroes():
         print(hero_spider_boy.team.heroes)
 
 
+def remove_heroes_team():
+    with Session(engine) as session:
+        spider_boy = session.exec(select(Hero).where(Hero.name == 'Spider-Boy')).one()
+        spider_boy.team = None
+        session.add(spider_boy)
+        session.commit()
+        session.refresh(spider_boy)
+        print(spider_boy)
+
+
 def main():
     create_db_and_tables()
     create_teams_heroes()
@@ -124,6 +134,7 @@ def main():
     add_more_heroes()
     # hero1()
     select_heroes()
+    remove_heroes_team()
 
 
 if __name__ == "__main__":
