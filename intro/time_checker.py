@@ -1,7 +1,7 @@
 import random
 
-from sqlmodel import Field, Session, SQLModel, create_engine, select, or_, col
-from timer import outer
+from sqlmodel import Field, Session, SQLModel, create_engine, select
+from another.timer import outer
 from faker import Faker
 
 

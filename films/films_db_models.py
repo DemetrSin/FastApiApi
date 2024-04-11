@@ -19,7 +19,6 @@ class Film(Base):
     genres = relationship("Genre", secondary="film_genre_association", back_populates="films")
 
 
-
 class Producer(Base):
     __tablename__ = 'Producers'
     id = Column(Integer, primary_key=True, index=True, autoincrement=True)
