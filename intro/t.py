@@ -106,12 +106,24 @@ def hero1():
         print(hero)
 
 
+def select_heroes():
+    with Session(engine) as session:
+        hero_spider_boy = session.exec(select(Hero).where(Hero.name == 'Spider-Boy')).one()
+        spiders_team = session.exec(select(Team).where(Team.id == hero_spider_boy.team_id)).first()
+        print(spiders_team)
+        print(hero_spider_boy.team)
+        team_preventers = session.exec(select(Team).where(Team.name == 'Preventers')).one()
+        print(team_preventers.heroes)
+        print(hero_spider_boy.team.heroes)
+
+
 def main():
     create_db_and_tables()
     create_teams_heroes()
     create_heroes_teams()
     add_more_heroes()
     # hero1()
+    select_heroes()
 
 
 if __name__ == "__main__":
