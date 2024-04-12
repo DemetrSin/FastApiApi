@@ -69,7 +69,6 @@ def create_data():
         timoti_shalame = Actor(name='Timoti Shalame', films=[dune])
         adventure = Genre(name='Adventure', films=[dune])
         session.add_all((dune, deni_vilnev, ostin_batler, timoti_shalame, adventure))
-        # session.commit()
         dune_from_db = session.exec(select(Film).where(Film.name == 'Dune')).one()
         print(dune_from_db)
         print(dune_from_db.producers)
