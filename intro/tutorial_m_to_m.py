@@ -4,6 +4,10 @@ from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, sele
 class HeroTeamLink(SQLModel, table=True):
     team_id: int | None = Field(default=None, foreign_key="team.id", primary_key=True)
     hero_id: int | None = Field(default=None, foreign_key="hero.id", primary_key=True)
+    is_training: bool = False
+
+    team: "Team" = Relationship(back_populates="hero_links")
+    hero: "Hero" = Relationship(back_populates="team_links")
 
 
 class Team(SQLModel, table=True):
@@ -11,7 +15,7 @@ class Team(SQLModel, table=True):
     name: str = Field(index=True)
     headquarters: str
 
-    heroes: list["Hero"] = Relationship(back_populates="teams", link_model=HeroTeamLink)
+    hero_links: list[HeroTeamLink] = Relationship(back_populates="team")
 
 
 class Hero(SQLModel, table=True):
@@ -20,7 +24,7 @@ class Hero(SQLModel, table=True):
     secret_name: str
     age: int | None = Field(default=None, index=True)
 
-    teams: list[Team] = Relationship(back_populates="heroes", link_model=HeroTeamLink)
+    team_links: list[HeroTeamLink] = Relationship(back_populates="hero")
 
 
 sqlite_file_name = "database.db"
@@ -41,46 +45,66 @@ def create_heroes():
         hero_deadpond = Hero(
             name="Deadpond",
             secret_name="Dive Wilson",
-            teams=[team_z_force, team_preventers],
         )
         hero_rusty_man = Hero(
             name="Rusty-Man",
             secret_name="Tommy Sharp",
             age=48,
-            teams=[team_preventers],
         )
         hero_spider_boy = Hero(
-            name="Spider-Boy", secret_name="Pedro Parqueador", teams=[team_preventers]
+            name="Spider-Boy",
+            secret_name="Pedro Parqueador",
         )
-        session.add(hero_deadpond)
-        session.add(hero_rusty_man)
-        session.add(hero_spider_boy)
+        deadpond_team_z_link = HeroTeamLink(team=team_z_force, hero=hero_deadpond)
+        deadpond_preventers_link = HeroTeamLink(
+            team=team_preventers, hero=hero_deadpond, is_training=True
+        )
+        spider_boy_preventers_link = HeroTeamLink(
+            team=team_preventers, hero=hero_spider_boy, is_training=True
+        )
+        rusty_man_preventers_link = HeroTeamLink(
+            team=team_preventers, hero=hero_rusty_man
+        )
+
+        session.add(deadpond_team_z_link)
+        session.add(deadpond_preventers_link)
+        session.add(spider_boy_preventers_link)
+        session.add(rusty_man_preventers_link)
         session.commit()
 
-        session.refresh(hero_deadpond)
-        session.refresh(hero_rusty_man)
-        session.refresh(hero_spider_boy)
+        for link in team_z_force.hero_links:
+            print("Z-Force hero:", link.hero, "is training:", link.is_training)
 
-        print("Deadpond:", hero_deadpond)
-        print("Deadpond teams:", hero_deadpond.teams)
-        print("Rusty-Man:", hero_rusty_man)
-        print("Rusty-Man Teams:", hero_rusty_man.teams)
-        print("Spider-Boy:", hero_spider_boy)
-        print("Spider-Boy Teams:", hero_spider_boy.teams)
+        for link in team_preventers.hero_links:
+            print("Preventers hero:", link.hero, "is training:", link.is_training)
 
 
 def update_heroes():
     with Session(engine) as session:
-        spider_boy = session.exec(select(Hero).where(Hero.name == 'Spider-Boy')).one()
-        z_force = session.exec(select(Team).where(Team.name == 'Z-Force')).one()
-        z_force.heroes.append(spider_boy)
-        session.add(z_force)
+        hero_spider_boy = session.exec(
+            select(Hero).where(Hero.name == "Spider-Boy")
+        ).one()
+        team_z_force = session.exec(select(Team).where(Team.name == "Z-Force")).one()
+
+        spider_boy_z_force_link = HeroTeamLink(
+            team=team_z_force, hero=hero_spider_boy, is_training=True
+        )
+        team_z_force.hero_links.append(spider_boy_z_force_link)
+        session.add(team_z_force)
         session.commit()
-        print(spider_boy.teams)
-        spider_boy.teams.remove(z_force)
-        session.add(z_force)
+
+        print("Updated Spider-Boy's Teams:", hero_spider_boy.team_links)
+        print("Z-Force heroes:", team_z_force.hero_links)
+
+        for link in hero_spider_boy.team_links:
+            if link.team.name == "Preventers":
+                link.is_training = False
+
+        session.add(hero_spider_boy)
         session.commit()
-        print(spider_boy.teams)
+
+        for link in hero_spider_boy.team_links:
+            print("Spider-Boy team:", link.team, "is training:", link.is_training)
 
 
 def main():
