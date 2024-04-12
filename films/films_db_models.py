@@ -1,58 +1,84 @@
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session, relationship
-from sqlalchemy import create_engine, Column, Integer, String, Date, Float, ForeignKey
+from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
 
 
-Base = declarative_base()
+class FilmProducerAssociation(SQLModel, table=True):
+    film_id: int | None = Field(default=None, primary_key=True, foreign_key='film.id')
+    producer_id: int | None = Field(default=None, primary_key=True, foreign_key='producer.id')
 
 
-class Film(Base):
-    __tablename__ = 'Films'
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    film_name = Column(String, index=True)
-    release_date = Column(Date)
-    duration = Column(Integer)
-    description = Column(String)
-    rating = Column(Float)
-    producers = relationship('Producer', secondary='film_producer_association', back_populates="films")
-    actors = relationship("Actor", secondary="film_actor_association", back_populates="films")
-    genres = relationship("Genre", secondary="film_genre_association", back_populates="films")
+class FilmActorAssociation(SQLModel, table=True):
+    film_id: int | None = Field(default=None, primary_key=True, foreign_key='film.id')
+    producer_id: int | None = Field(default=None, primary_key=True, foreign_key='actor.id')
 
 
-class Producer(Base):
-    __tablename__ = 'Producers'
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    full_name = Column(String)
-    films = relationship("Film", secondary="film_producer_association", back_populates="producers")
+class FilmGenreAssociation(SQLModel, table=True):
+    film_id: int | None = Field(default=None, primary_key=True, foreign_key='film.id')
+    producer_id: int | None = Field(default=None, primary_key=True, foreign_key='genre.id')
 
 
-class Actor(Base):
-    __tablename__ = 'Actors'
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    full_name = Column(String)
-    films = relationship("Film", secondary="film_actor_association")
+class Film(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(index=True)
+    release_date: int
+    duration: int
+    description: str | None = Field(default='No description')
+    rating: float
+    producers: list['Producer'] = Relationship(back_populates='films', link_model=FilmProducerAssociation)
+    actors: list['Actor'] = Relationship(back_populates='films', link_model=FilmActorAssociation)
+    genres: list['Genre'] = Relationship(back_populates='films', link_model=FilmGenreAssociation)
 
 
-class Genre(Base):
-    __tablename__ = 'Genres'
-    id = Column(Integer, primary_key=True, index=True, autoincrement=True)
-    genre_name = Column(String)
-    films = relationship("Film", secondary="film_genre_association")
+class Producer(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(index=True)
+    films: list[Film] = Relationship(back_populates='producers', link_model=FilmProducerAssociation)
 
 
-class FilmProducerAssociation(Base):
-    __tablename__ = 'film_producer_association'
-    film_id = Column(Integer, ForeignKey('Films.id'), primary_key=True)
-    genre_id = Column(Integer, ForeignKey('Producers.id'), primary_key=True)
+class Actor(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(index=True)
+    films: list[Film] = Relationship(back_populates='actors', link_model=FilmActorAssociation)
 
 
-class FilmActorAssociation(Base):
-    __tablename__ = 'film_actor_association'
-    film_id = Column(Integer, ForeignKey('Films.id'), primary_key=True)
-    actor_id = Column(Integer, ForeignKey('Actors.id'), primary_key=True)
+class Genre(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    name: str = Field(index=True)
+    films: list[Film] = Relationship(back_populates='genres', link_model=FilmGenreAssociation)
 
 
-class FilmGenreAssociation(Base):
-    __tablename__ = 'film_genre_association'
-    film_id = Column(Integer, ForeignKey('Films.id'), primary_key=True)
-    genre_id = Column(Integer, ForeignKey('Genres.id'), primary_key=True)
+# def create_data():
+#     with Session(engine) as session:
+#         dune = Film(
+#             name='Dune',
+#             release_date=2021,
+#             duration=149,
+#             rating=4.5,
+#         )
+#         deni_vilnev = Producer(name='Deni Vilnev', films=[dune])
+#         ostin_batler = Actor(name='Ostin Batler', films=[dune])
+#         timoti_shalame = Actor(name='Timoti Shalame', films=[dune])
+#         adventure = Genre(name='Adventure', films=[dune])
+#         session.add_all((dune, deni_vilnev, ostin_batler, timoti_shalame, adventure))
+#         dune_from_db = session.exec(select(Film).where(Film.name == 'Dune')).one()
+#         print(dune_from_db)
+#         print(dune_from_db.producers)
+#         print(dune_from_db.actors)
+#         print(dune_from_db.genres)
+#         actor = session.get(Actor, 1)
+#         print(actor)
+#
+#
+# def main():
+#     create_db_and_tables()
+#     create_data()
+#
+#
+# if __name__ == "__main__":
+#     main()
+
+
+
+
+
+
+
