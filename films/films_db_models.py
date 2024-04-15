@@ -1,4 +1,4 @@
-from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
+from sqlmodel import Field, Relationship, SQLModel
 
 
 class FilmProducerAssociation(SQLModel, table=True):
@@ -8,12 +8,12 @@ class FilmProducerAssociation(SQLModel, table=True):
 
 class FilmActorAssociation(SQLModel, table=True):
     film_id: int | None = Field(default=None, primary_key=True, foreign_key='film.id')
-    producer_id: int | None = Field(default=None, primary_key=True, foreign_key='actor.id')
+    actor_id: int | None = Field(default=None, primary_key=True, foreign_key='actor.id')
 
 
 class FilmGenreAssociation(SQLModel, table=True):
     film_id: int | None = Field(default=None, primary_key=True, foreign_key='film.id')
-    producer_id: int | None = Field(default=None, primary_key=True, foreign_key='genre.id')
+    genre_id: int | None = Field(default=None, primary_key=True, foreign_key='genre.id')
 
 
 class Film(SQLModel, table=True):
@@ -44,41 +44,3 @@ class Genre(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     name: str = Field(index=True)
     films: list[Film] = Relationship(back_populates='genres', link_model=FilmGenreAssociation)
-
-
-# def create_data():
-#     with Session(engine) as session:
-#         dune = Film(
-#             name='Dune',
-#             release_date=2021,
-#             duration=149,
-#             rating=4.5,
-#         )
-#         deni_vilnev = Producer(name='Deni Vilnev', films=[dune])
-#         ostin_batler = Actor(name='Ostin Batler', films=[dune])
-#         timoti_shalame = Actor(name='Timoti Shalame', films=[dune])
-#         adventure = Genre(name='Adventure', films=[dune])
-#         session.add_all((dune, deni_vilnev, ostin_batler, timoti_shalame, adventure))
-#         dune_from_db = session.exec(select(Film).where(Film.name == 'Dune')).one()
-#         print(dune_from_db)
-#         print(dune_from_db.producers)
-#         print(dune_from_db.actors)
-#         print(dune_from_db.genres)
-#         actor = session.get(Actor, 1)
-#         print(actor)
-#
-#
-# def main():
-#     create_db_and_tables()
-#     create_data()
-#
-#
-# if __name__ == "__main__":
-#     main()
-
-
-
-
-
-
-
