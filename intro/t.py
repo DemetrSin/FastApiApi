@@ -95,5 +95,12 @@ def update_hero(hero_id: int, hero: HeroUpdate):
         return db_hero
 
 
-
-
+@app.delete("/heroes/{hero_id}/")
+def delete_hero(hero_id: int):
+    with Session(engine) as session:
+        db_hero = session.get(Hero, hero_id)
+        if not db_hero:
+            raise HTTPException(status_code=404, detail='Hero not found')
+        session.delete(db_hero)
+        session.commit()
+        return {"ok": True}
