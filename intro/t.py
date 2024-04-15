@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query
 from sqlmodel import Field, Session, SQLModel, create_engine, select
 
 
@@ -34,12 +34,12 @@ def create_db_and_tables():
 app = FastAPI()
 
 
-@app.on_event('startup')
+@app.on_event("startup")
 def on_startup():
     create_db_and_tables()
 
 
-@app.post('/heroes', response_model=HeroPublic)
+@app.post("/heroes/", response_model=HeroPublic)
 def create_hero(hero: HeroCreate):
     with Session(engine) as session:
         db_hero = Hero.model_validate(hero)
@@ -49,18 +49,17 @@ def create_hero(hero: HeroCreate):
         return db_hero
 
 
-@app.get('/heroes/', response_model=list[Hero])
-def read_heroes():
+@app.get("/heroes/", response_model=list[HeroPublic])
+def read_heroes(offset: int = 0, limit: int = Query(default=100, le=100)):
     with Session(engine) as session:
-        heroes = session.exec(select(Hero)).all()
+        heroes = session.exec(select(Hero).offset(offset).limit(limit)).all()
         return heroes
 
 
-@app.get('/heroes/{hero_id}/', response_model=HeroPublic)
+@app.get("/heroes/{hero_id}", response_model=HeroPublic)
 def read_hero(hero_id: int):
     with Session(engine) as session:
         hero = session.get(Hero, hero_id)
         if not hero:
             raise HTTPException(status_code=404, detail="Hero not found")
         return hero
-
