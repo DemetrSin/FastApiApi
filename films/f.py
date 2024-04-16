@@ -7,11 +7,11 @@ class FilmBase(SQLModel):
     duration: int
     description: str | None = Field(default='No description')
     rating: float
-    producer: list['Producer'] = Relationship(back_populates='films')
 
 
 class Film(FilmBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
+    producer: list['Producer'] = Relationship(back_populates='films')
 
 
 class FilmCreate(FilmBase):
