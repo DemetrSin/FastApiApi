@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from sqlmodel import Session
 
 from database import create_db_and_tables, engine
-from films_db_models import Film, Producer, Genre, Actor
+from films_db_models_raw_version import Film, Producer, Genre, Actor
 
 app = FastAPI()
 
