@@ -24,8 +24,7 @@ from films_db_models import (
 )
 from fastapi import FastAPI, Depends, Query, HTTPException
 from database import create_db_and_tables, engine
-from sqlmodel import Session, select
-# from api_routine_handler import creation_routine_handler, session_routine_handler, deletion_handler, get_object_handler, get_objects_handler
+from sqlmodel import Session
 from api_routine_handler import ApiRoutineHandler
 from sqlalchemy.exc import IntegrityError
 
@@ -148,13 +147,7 @@ def update_producer(
         producer: ProducerUpdate,
         session: Session = Depends(get_session)
 ):
-    db_producer = session.get(Producer, producer_id)
-    if not db_producer:
-        raise HTTPException(status_code=404, detail='Producer not Found')
-    producer_data = producer.model_dump(exclude_unset=True)
-    for key, value in producer_data.items():
-        setattr(db_producer, key, value)
-    return handler.session_routine_handler(obj=db_producer, session=session)
+    return handler.update_object_handler(obj=producer, cls=Producer, session=session, obj_id=producer_id)
 
 
 @app.delete('/producers/{producer_id}')
@@ -191,13 +184,7 @@ def update_actor(
         actor: ActorUpdate,
         session: Session = Depends(get_session)
 ):
-    db_actor = session.get(Actor, actor_id)
-    if not db_actor:
-        raise HTTPException(status_code=404, detail='Actor not Found')
-    actor_data = actor.model_dump(exclude_unset=True)
-    for key, value in actor_data.items():
-        setattr(db_actor, key, value)
-    return handler.session_routine_handler(obj=db_actor, session=session)
+    return handler.update_object_handler(obj=actor, cls=Actor, session=session, obj_id=actor_id)
 
 
 @app.delete('/actors/{actor_id}')
@@ -234,13 +221,7 @@ def update_genre(
         genre: GenreUpdate,
         session: Session = Depends(get_session)
 ):
-    db_genre = session.get(Genre, genre_id)
-    if not db_genre:
-        raise HTTPException(status_code=404, detail='Genre not Found')
-    genre_data = genre.model_dump(exclude_unset=True)
-    for key, value in genre_data.items():
-        setattr(db_genre, key, value)
-    return handler.session_routine_handler(obj=db_genre, session=session)
+    return handler.update_object_handler(obj=genre, cls=Genre, session=session, obj_id=genre_id)
 
 
 @app.delete('/genres/{genre_id}')

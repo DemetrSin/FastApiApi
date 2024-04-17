@@ -59,6 +59,14 @@ class ApiRoutineHandler:
         self.if_not(obj=db_objects, cls=cls)
         return db_objects
 
+    def update_object_handler(self, *, obj, cls, session, obj_id):
+        db_obj = session.get(cls, obj_id)
+        self.if_not(obj=db_obj, cls=cls)
+        obj_data = obj.model_dump(exclude_unset=True)
+        for key, value in obj_data.items():
+            setattr(db_obj, key, value)
+        return self.session_routine_handler(obj=db_obj, session=session)
+
     @staticmethod
     def session_routine_handler(obj, session):
         session.add(obj)
