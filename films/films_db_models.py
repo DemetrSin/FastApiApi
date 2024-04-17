@@ -17,8 +17,8 @@ class FilmGenreAssociation(SQLModel, table=True):
 
 
 class FilmBase(SQLModel):
-    name: str = Field(index=True)
-    release_date: int
+    name: str = Field(index=True, unique=True)
+    release_date: str
     duration: int
     description: str | None = Field(default='No description')
     rating: float
@@ -33,6 +33,17 @@ class Film(FilmBase, table=True):
 
 class FilmCreate(FilmBase):
     pass
+
+
+class FilmUpdate(FilmBase):
+    name: str | None = None
+    release_date: str | None = None
+    duration: int | None = None
+    description: str | None = None
+    rating: float | None = None
+    producers: list['ProducerCreate'] | None = None
+    actors: list['ActorCreate'] | None = None
+    genres: list['GenreCreate'] | None = None
 
 
 class FilmPublic(FilmBase):
@@ -59,6 +70,10 @@ class ProducerCreate(ProducerBase):
     pass
 
 
+class ProducerUpdate(ProducerBase):
+    name: str | None = None
+
+
 class ProducerPublic(ProducerBase):
     id: int
 
@@ -81,6 +96,10 @@ class ActorCreate(ActorBase):
     pass
 
 
+class ActorUpdate(ActorBase):
+    name: str | None = None
+
+
 class ActorPublic(ActorBase):
     id: int
 
@@ -101,6 +120,10 @@ class Genre(GenreBase, table=True):
 
 class GenreCreate(GenreBase):
     pass
+
+
+class GenreUpdate(GenreBase):
+    name: str | None = None
 
 
 class GenrePublic(GenreBase):
