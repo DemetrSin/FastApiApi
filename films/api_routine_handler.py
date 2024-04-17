@@ -48,8 +48,30 @@ def if_not_routine_handler(obj, status_code, detail):
     return obj
 
 
+def if_not(*, obj, cls):
+    if not obj:
+        detail = f"{cls.__name__} not Found"
+        raise HTTPException(status_code=404, detail=detail)
+
+
+def get_object_handler(*, cls, obj_id, session):
+    db_obj = session.get(cls, obj_id)
+    if_not(obj=db_obj, cls=cls)
+    return db_obj
+
+
 def session_routine_handler(obj, session):
     session.add(obj)
     session.commit()
     session.refresh(obj)
     return obj
+
+
+def deletion_handler(*, cls, obj_id, session,):
+    db_obj = session.get(cls, obj_id)
+    if not db_obj:
+        detail = f"{cls.__name__} not Found"
+        raise HTTPException(status_code=404, detail=detail)
+    session.delete(db_obj)
+    session.commit()
+    return {'ok': 'Successful deletion'}

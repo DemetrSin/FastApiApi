@@ -25,7 +25,7 @@ from films_db_models import (
 from fastapi import FastAPI, Depends, Query, HTTPException
 from database import create_db_and_tables, engine
 from sqlmodel import Session, select
-from api_routine_handler import creation_routine_handler, if_not_routine_handler, session_routine_handler
+from api_routine_handler import creation_routine_handler, if_not_routine_handler, session_routine_handler, deletion_handler, get_object_handler
 from sqlalchemy.exc import IntegrityError
 
 app = FastAPI()
@@ -80,8 +80,7 @@ def create_film(
 
 @app.get('/films/{film_id}', response_model=FilmPublicFull)
 def get_film(film_id, session: Session = Depends(get_session)):
-    db_film = session.get(Film, film_id)
-    return if_not_routine_handler(obj=db_film, status_code=404, detail='Film not Found')
+    return get_object_handler(cls=Film, obj_id=film_id, session=session)
 
 
 @app.get('/films/', response_model=list[FilmPublic])
@@ -101,9 +100,6 @@ def update_film(film_id: int, film: FilmUpdate, session: Session = Depends(get_s
     if not db_film:
         raise HTTPException(status_code=404, detail='Film not Found')
     film_data = film.model_dump(exclude_unset=True)
-    print('\n'*5)
-    print(film_data)
-    print('\n'*5)
     for key, value in film_data.items():
         if key == 'producers':
             db_film.producers = [Producer(**p) for p in value]
@@ -114,6 +110,11 @@ def update_film(film_id: int, film: FilmUpdate, session: Session = Depends(get_s
         else:
             setattr(db_film, key, value)
     return session_routine_handler(obj=db_film, session=session)
+
+
+@app.delete('/films/{film_id}')
+def delete_films(film_id: int, session: Session = Depends(get_session)):
+    return deletion_handler(cls=Film, obj_id=film_id, session=session)
 
 
 # PRODUCERS PART
@@ -127,8 +128,7 @@ def create_producer(producer: ProducerCreate, session: Session = Depends(get_ses
 
 @app.get('/producers/{producer_id}', response_model=ProducerPublicWithFilms)
 def get_producer(*, session: Session = Depends(get_session), producer_id):
-    db_producer = session.get(Producer, producer_id)
-    return if_not_routine_handler(obj=db_producer, status_code=404, detail='Producer not Found')
+    return get_object_handler(cls=Producer, obj_id=producer_id, session=session)
 
 
 @app.get('/producers/', response_model=list[ProducerPublic])
@@ -156,6 +156,11 @@ def update_producer(
     return session_routine_handler(obj=db_producer, session=session)
 
 
+@app.delete('/producers/{producer_id}')
+def delete_producer(producer_id: int, session: Session = Depends(get_session)):
+    return deletion_handler(cls=Producer, obj_id=producer_id, session=session)
+
+
 # ACTORS PART
 
 
@@ -167,8 +172,7 @@ def create_actor(actor: ActorCreate, session: Session = Depends(get_session)):
 
 @app.get('/actors/{actor_id}', response_model=ActorPublicWithFilms)
 def get_actor(*, session: Session = Depends(get_session), actor_id):
-    db_actor = session.get(Actor, actor_id)
-    return if_not_routine_handler(obj=db_actor, status_code=404, detail='Actor not Found')
+    return get_object_handler(cls=Actor, obj_id=actor_id, session=session)
 
 
 @app.get('/actors/', response_model=list[ActorPublic])
@@ -196,6 +200,11 @@ def update_actor(
     return session_routine_handler(obj=db_actor, session=session)
 
 
+@app.delete('/actors/{actor_id}')
+def delete_actor(actor_id: int, session: Session = Depends(get_session)):
+    return deletion_handler(cls=Actor, obj_id=actor_id, session=session)
+
+
 # GENRES PART
 
 
@@ -207,8 +216,7 @@ def create_genre(genre: GenreCreate, session: Session = Depends(get_session)):
 
 @app.get('/genres/{genre_id}/', response_model=GenrePublicWithFilms)
 def get_genre(genre_id, session: Session = Depends(get_session)):
-    db_genre = session.get(Genre, genre_id)
-    return if_not_routine_handler(obj=db_genre, status_code=404, detail='Genre not Found')
+    return get_object_handler(cls=Genre, obj_id=genre_id, session=session)
 
 
 @app.get('/genres/', response_model=list[GenrePublic])
@@ -234,6 +242,11 @@ def update_genre(
     for key, value in genre_data.items():
         setattr(db_genre, key, value)
     return session_routine_handler(obj=db_genre, session=session)
+
+
+@app.delete('/genres/{genre_id}')
+def delete_genre(genre_id: int, session: Session = Depends(get_session)):
+    return deletion_handler(cls=Genre, obj_id=genre_id, session=session)
 
 
 if __name__ == '__main__':
