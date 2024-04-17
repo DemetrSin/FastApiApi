@@ -31,6 +31,25 @@ def on_startup():
     create_db_and_tables()
 
 
+def creation(lst, cls, session, db_film):
+    for entity in lst:
+        db_entity = session.exec(select(cls).where(cls.name == entity.name)).first()
+        if db_entity:
+            db_entity.films.append(db_film)
+        else:
+            db_entity = cls.model_validate(entity)
+            if isinstance(db_entity, Producer):
+                db_film.producers.append(db_entity)
+            elif isinstance(db_entity, Actor):
+                db_film.actors.append(db_entity)
+
+
+def if_not_handler(obj, status_code, detail):
+    if not obj:
+        raise HTTPException(status_code=status_code, detail=detail)
+    return obj
+
+
 @app.post('/films/', response_model=FilmPublicFull)
 def post_film(
         *,
@@ -58,9 +77,7 @@ def post_film(
 @app.get('/films/{film_id}', response_model=FilmPublicFull)
 def get_film(film_id, session: Session = Depends(get_session)):
     db_film = session.get(Film, film_id)
-    if not db_film:
-        raise HTTPException(status_code=404, detail='Film not Found')
-    return db_film
+    return if_not_handler(obj=db_film, status_code=404, detail='Film not Found')
 
 
 @app.get('/films/', response_model=list[FilmPublic])
@@ -71,30 +88,13 @@ def get_films(
         limit: int = Query(default=10, le=10)
 ):
     db_films = session.exec(select(Film).offset(offset).limit(limit)).all()
-    if not db_films:
-        raise HTTPException(status_code=404, detail='Films not Found')
-    return db_films
-
-
-def creation(lst, cls, session, db_film):
-    for entity in lst:
-        db_entity = session.exec(select(cls).where(cls.name == entity.name)).first()
-        if db_entity:
-            db_entity.films.append(db_film)
-        else:
-            db_entity = cls.model_validate(entity)
-            if isinstance(db_entity, Producer):
-                db_film.producers.append(db_entity)
-            elif isinstance(db_entity, Actor):
-                db_film.actors.append(db_entity)
+    return if_not_handler(obj=db_films, status_code=404, detail='Films not Found')
 
 
 @app.get('/producers/{producer_id}', response_model=ProducerPublicWithFilms)
 def get_producer(*, session: Session = Depends(get_session), producer_id):
     db_producer = session.get(Producer, producer_id)
-    if not db_producer:
-        raise HTTPException(status_code=404, detail='Producer not Found')
-    return db_producer
+    return if_not_handler(obj=db_producer, status_code=404, detail='Producer not Found')
 
 
 @app.get('/producers/', response_model=list[ProducerPublic])
@@ -104,18 +104,13 @@ def get_producers(
         limit: int = Query(default=10, le=10)
 ):
     db_producers = session.exec(select(Producer).offset(offset).limit(limit)).all()
-    if not db_producers:
-        raise HTTPException(status_code=404, detail='Producers not Found')
-
-    return db_producers
+    return if_not_handler(obj=db_producers, status_code=404, detail='Producers not Found')
 
 
 @app.get('/actors/{actor_id}', response_model=ActorPublicWithFilms)
 def get_actor(*, session: Session = Depends(get_session), actor_id):
     db_actor = session.get(Actor, actor_id)
-    if not db_actor:
-        raise HTTPException(status_code=404, detail='Actor not Found')
-    return db_actor
+    return if_not_handler(obj=db_actor, status_code=404, detail='Actor not Found')
 
 
 @app.get('/actors/', response_model=list[ActorPublic])
@@ -125,9 +120,7 @@ def get_actors(
         limit: int = Query(default=10, le=10)
 ):
     db_actors = session.exec(select(Actor).offset(offset).limit(limit)).all()
-    if not db_actors:
-        raise HTTPException(status_code=404, detail='Actors not Found')
-    return db_actors
+    return if_not_handler(obj=db_actors, status_code=404, detail='Actors not Found')
 
 
 if __name__ == '__main__':
