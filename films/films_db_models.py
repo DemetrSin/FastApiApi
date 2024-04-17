@@ -11,9 +11,9 @@ class FilmActorAssociation(SQLModel, table=True):
     actor_id: int | None = Field(default=True, primary_key=True, foreign_key='actor.id')
 
 
-# class FilmGenreAssociation(SQLModel, table=True):
-#     film_id: int | None = Field(default=None, primary_key=True, foreign_key='film.id')
-#     genre_id: int | None = Field(default=None, primary_key=True, foreign_key='genre.id')
+class FilmGenreAssociation(SQLModel, table=True):
+    film_id: int | None = Field(default=None, primary_key=True, foreign_key='film.id')
+    genre_id: int | None = Field(default=None, primary_key=True, foreign_key='genre.id')
 
 
 class FilmBase(SQLModel):
@@ -28,6 +28,7 @@ class Film(FilmBase, table=True):
     id: int | None = Field(default=None, primary_key=True)
     producers: list['Producer'] = Relationship(back_populates='films', link_model=FilmProducerAssociation)
     actors: list['Actor'] = Relationship(back_populates='films', link_model=FilmActorAssociation)
+    genres: list['Genre'] = Relationship(back_populates='films', link_model=FilmGenreAssociation)
 
 
 class FilmCreate(FilmBase):
@@ -42,6 +43,7 @@ class FilmPublicFull(FilmBase):
     id: int
     producers: list['ProducerPublic']
     actors: list['ActorPublic']
+    genres: list['GenrePublic']
 
 
 class ProducerBase(SQLModel):
@@ -84,6 +86,28 @@ class ActorPublic(ActorBase):
 
 
 class ActorPublicWithFilms(ActorBase):
+    id: int
+    films: list[FilmPublic]
+
+
+class GenreBase(SQLModel):
+    name: str = Field(index=True)
+
+
+class Genre(GenreBase, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    films: list[Film] = Relationship(back_populates='genres', link_model=FilmGenreAssociation)
+
+
+class GenreCreate(GenreBase):
+    pass
+
+
+class GenrePublic(GenreBase):
+    id: int
+
+
+class GenrePublicWithFilms(GenreBase):
     id: int
     films: list[FilmPublic]
 

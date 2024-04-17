@@ -12,7 +12,11 @@ from films_db_models import (
     Actor,
     ActorCreate,
     ActorPublic,
-    ActorPublicWithFilms
+    ActorPublicWithFilms,
+    Genre,
+    GenreCreate,
+    GenrePublic,
+    GenrePublicWithFilms
 )
 from fastapi import FastAPI, Depends, Query
 from database import create_db_and_tables, engine
@@ -30,6 +34,9 @@ def get_session():
 @app.on_event('startup')
 def on_startup():
     create_db_and_tables()
+
+
+# FILMS PART
 
 
 @app.post('/films/', response_model=FilmPublicFull)
@@ -56,12 +63,6 @@ def create_film(
     session_routine_handler(obj=db_film, session=session)
 
 
-@app.post('/actors/', response_model=ActorPublic)
-def create_actor(actor: ActorCreate, session: Session = Depends(get_session)):
-    db_actor = Actor.model_validate(actor)
-    return session_routine_handler(obj=db_actor, session=session)
-
-
 @app.get('/films/{film_id}', response_model=FilmPublicFull)
 def get_film(film_id, session: Session = Depends(get_session)):
     db_film = session.get(Film, film_id)
@@ -77,6 +78,15 @@ def get_films(
 ):
     db_films = session.exec(select(Film).offset(offset).limit(limit)).all()
     return if_not_routine_handler(obj=db_films, status_code=404, detail='Films not Found')
+
+
+# PRODUCERS PART
+
+
+@app.post('/producers/', response_model=ProducerPublic)
+def create_producer(producer: ProducerCreate, session: Session = Depends(get_session)):
+    db_producer = Producer.model_validate(producer)
+    return session_routine_handler(obj=db_producer, session=session)
 
 
 @app.get('/producers/{producer_id}', response_model=ProducerPublicWithFilms)
@@ -95,6 +105,15 @@ def get_producers(
     return if_not_routine_handler(obj=db_producers, status_code=404, detail='Producers not Found')
 
 
+# ACTORS PART
+
+
+@app.post('/actors/', response_model=ActorPublic)
+def create_actor(actor: ActorCreate, session: Session = Depends(get_session)):
+    db_actor = Actor.model_validate(actor)
+    return session_routine_handler(obj=db_actor, session=session)
+
+
 @app.get('/actors/{actor_id}', response_model=ActorPublicWithFilms)
 def get_actor(*, session: Session = Depends(get_session), actor_id):
     db_actor = session.get(Actor, actor_id)
@@ -109,6 +128,31 @@ def get_actors(
 ):
     db_actors = session.exec(select(Actor).offset(offset).limit(limit)).all()
     return if_not_routine_handler(obj=db_actors, status_code=404, detail='Actors not Found')
+
+
+# GENRES PART
+
+
+@app.post('/genres/', response_model=GenrePublic)
+def create_genre(genre: GenreCreate, session: Session = Depends(get_session)):
+    db_genre = Genre.model_validate(genre)
+    return session_routine_handler(obj=db_genre, session=session)
+
+
+@app.get('/genres/{genre_id}/', response_model=GenrePublicWithFilms)
+def get_genre(genre_id, session: Session = Depends(get_session)):
+    db_genre = session.get(Genre, genre_id)
+    return if_not_routine_handler(obj=db_genre, status_code=404, detail='Genre not Found')
+
+
+@app.get('/genres/', response_model=list[GenrePublic])
+def get_genres(
+        session: Session = Depends(get_session),
+        offset: int = 0,
+        limit: int = Query(default=10, le=10)
+):
+    db_genres = session.exec(select(Genre).offset(offset).limit(limit)).all()
+    return if_not_routine_handler(obj=db_genres, status_code=404, detail='Genres not Found')
 
 
 if __name__ == '__main__':
