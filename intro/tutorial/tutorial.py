@@ -1,4 +1,4 @@
-from sqlmodel import Field, Session, SQLModel, create_engine, select, or_, col
+from sqlmodel import Field, Session, SQLModel, col, create_engine, or_, select
 
 
 class Hero(SQLModel, table=True):

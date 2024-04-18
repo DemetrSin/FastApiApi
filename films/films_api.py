@@ -1,33 +1,17 @@
 import uvicorn
-
-from films_db_models import (
-    Film,
-    FilmCreate,
-    FilmUpdate,
-    FilmPublic,
-    FilmPublicFull,
-    Producer,
-    ProducerCreate,
-    ProducerUpdate,
-    ProducerPublic,
-    ProducerPublicWithFilms,
-    Actor,
-    ActorCreate,
-    ActorUpdate,
-    ActorPublic,
-    ActorPublicWithFilms,
-    Genre,
-    GenreCreate,
-    GenreUpdate,
-    GenrePublic,
-    GenrePublicWithFilms
-)
-from fastapi import FastAPI, Depends, Query, HTTPException
-from database import create_db_and_tables, engine
-from sqlmodel import Session
-from api_routine_handler import ApiRoutineHandler
+from fastapi import Depends, FastAPI, HTTPException, Query
 from sqlalchemy.exc import IntegrityError
+from sqlmodel import Session
 
+from .api_routine_handler import ApiRoutineHandler
+from .database import create_db_and_tables, engine
+from .films_db_models import (Actor, ActorCreate, ActorPublic,
+                              ActorPublicWithFilms, ActorUpdate, Film,
+                              FilmCreate, FilmPublic, FilmPublicFull,
+                              FilmUpdate, Genre, GenreCreate, GenrePublic,
+                              GenrePublicWithFilms, GenreUpdate, Producer,
+                              ProducerCreate, ProducerPublic,
+                              ProducerPublicWithFilms, ProducerUpdate)
 
 app = FastAPI()
 handler = ApiRoutineHandler()

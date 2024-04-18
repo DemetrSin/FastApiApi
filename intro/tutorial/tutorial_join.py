@@ -1,5 +1,5 @@
-from sqlmodel import Field, SQLModel, create_engine, Session, select
-from tutorial import Hero, engine, create_db_and_tables
+from sqlmodel import Field, Session, SQLModel, create_engine, select
+from tutorial import Hero, create_db_and_tables, engine
 
 
 class Team(SQLModel, table=True):

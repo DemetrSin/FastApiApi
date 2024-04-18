@@ -1,11 +1,11 @@
 from typing import List
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import Depends, FastAPI, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
+from sqlalchemy import (Column, Float, ForeignKey, Integer, String,
+                        create_engine)
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import sessionmaker, Session
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import Session, relationship, sessionmaker
 
 app = FastAPI()
 

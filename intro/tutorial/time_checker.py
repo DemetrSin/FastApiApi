@@ -1,9 +1,9 @@
 import random
 
-from sqlmodel import Field, Session, SQLModel, create_engine, select
-from another.timer import outer
 from faker import Faker
+from sqlmodel import Field, Session, SQLModel, create_engine, select
 
+from another.timer import outer
 
 sqlite_file_name = "person.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"

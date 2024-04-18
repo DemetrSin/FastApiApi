@@ -1,4 +1,5 @@
-from sqlmodel import Field, Relationship, Session, SQLModel, create_engine, select
+from sqlmodel import (Field, Relationship, Session, SQLModel, create_engine,
+                      select)
 
 
 class Team(SQLModel, table=True):
