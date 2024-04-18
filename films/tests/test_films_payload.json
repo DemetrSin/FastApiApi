@@ -1,0 +1,39 @@
+{
+  "film": {
+    "name": "Infinite Journey",
+    "release_date": "2024-07-15",
+    "duration": 150,
+    "description": "In a world where time is a commodity, a group of adventurers seeks to unlock the secrets of the universe.",
+    "rating": 8.5
+  },
+  "producers": [
+    {
+      "name": "Emily Smith"
+    },
+    {
+      "name": "Michael Johnson"
+    }
+  ],
+  "actors": [
+    {
+      "name": "Jessica Adams"
+    },
+    {
+      "name": "David Rodriguez"
+    },
+    {
+      "name": "Samuel Thompson"
+    }
+  ],
+  "genres": [
+    {
+      "name": "Science Fiction"
+    },
+    {
+      "name": "Adventure"
+    },
+    {
+      "name": "Drama"
+    }
+  ]
+}

@@ -1,7 +1,7 @@
 from fastapi import HTTPException
 from sqlmodel import select
 
-from films_db_models import Actor, Genre, Producer
+from .films_db_models import Actor, Genre, Producer
 
 
 class ApiRoutineHandler:
